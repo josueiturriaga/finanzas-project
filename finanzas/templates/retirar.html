@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retirar Fondos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg-body: #0f172a; --bg-card: #1e293b; --gold: #fbbf24; --text-main: #f1f5f9; }
+        html { background-color: var(--bg-body); }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .transfer-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 1px solid rgba(251, 191, 36, 0.1);
+            text-align: center;
+        }
+
+        h2 { margin: 0 0 10px 0; color: white; }
+        p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; }
+
+        .icon-header {
+            font-size: 3rem; color: var(--gold); margin-bottom: 20px;
+            filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.3));
+        }
+
+        label { display: block; text-align: left; margin-bottom: 8px; font-size: 0.9rem; color: #94a3b8; font-weight: 500; }
+        
+        input, select {
+            width: 100%; padding: 15px;
+            background: #0f172a; border: 1px solid #334155;
+            border-radius: 12px; color: white; font-family: 'Poppins'; font-size: 1rem;
+            margin-bottom: 20px; box-sizing: border-box; transition: 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--gold); }
+
+        button {
+            width: 100%; padding: 15px;
+            background: transparent; color: var(--gold);
+            border: 2px solid var(--gold); border-radius: 12px;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background: var(--gold); color: #0f172a; box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
+
+        .btn-cancel { display: block; margin-top: 20px; color: #f87171; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="transfer-card">
+        <div class="icon-header"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <h2>Retirar Fondos</h2>
+        <p>Traer dinero de la Bóveda a tu Billetera Diaria.</p>
+
+        {% if error %}
+        <div style="background: rgba(248, 113, 113, 0.15); border: 1px solid #f87171; color: #f87171; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 0.9rem; text-align: left; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <label>¿De dónde sacamos el dinero?</label>
+            <select name="origen">
+                <option value="ahorro">Mis Ahorros 🐖</option>
+                <option value="inversion">Mis Inversiones 📈</option>
+            </select>
+
+            <label>Monto a Retirar</label>
+            <input type="number" name="monto" placeholder="Ej: 20000" required>
+
+            <label>¿A dónde enviamos el dinero?</label>
+            <select name="destino_cuenta">
+                <option value="efectivo">Efectivo (Billetera)</option>
+                <option value="banco_estado">Banco Estado</option>
+                <option value="banco_falabella">Banco Falabella</option>
+                <option value="santander">Santander</option>
+                <option value="mach">MACH</option>
+            </select>
+
+            <button type="submit">Confirmar Retiro</button>
+            <a href="{% url 'ahorro' %}" class="btn-cancel">Cancelar</a>
+        </form>
+    </div>
+
+</body>
+</html>

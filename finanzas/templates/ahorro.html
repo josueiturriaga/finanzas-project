@@ -1,0 +1,255 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bóveda de Inversiones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { 
+            --bg-body: #0f172a; 
+            --bg-card: #1e293b; 
+            --gold: #fbbf24; 
+            --text-main: #f1f5f9; 
+            --car-color: #3b82f6; 
+            --vitality-blue: #38bdf8; /* Nuevo color para el logo */
+        }
+        html { background-color: var(--bg-body); }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 0; }
+        
+        .content-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .main-header { padding: 25px 40px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 1px solid rgba(251, 191, 36, 0.2); }
+        
+        /* LOGO VITALITY MODIFICADO */
+        .logo-link h1 { 
+            color: var(--vitality-blue); 
+            margin: 0; 
+            font-size: 1.5rem; 
+            text-decoration: none; 
+            font-weight: 700;
+        }
+        .logo-link { text-decoration: none; }
+        
+        /* --- TARJETA META (CON ANIMACIÓN) --- */
+        .goal-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid var(--car-color);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .goal-header-top {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            position: relative; 
+            z-index: 2;
+        }
+        
+        .goal-info h3 { margin: 0; color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+        .goal-info h2 { margin: 5px 0 0 0; color: white; font-size: 1.3rem; }
+        
+        .toggle-btn {
+            background: none; border: none; color: var(--car-color); font-size: 1.5rem; 
+            transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .rotated { transform: rotate(180deg); }
+
+        /* --- ESTRUCTURA DE ANIMACIÓN --- */
+        .accordion-wrapper {
+            display: grid;
+            grid-template-rows: 1fr;
+            transition: grid-template-rows 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .accordion-wrapper.collapsed { grid-template-rows: 0fr; }
+        .accordion-content { overflow: hidden; }
+
+        .goal-body {
+            padding: 0 20px 25px 20px;
+            opacity: 1; transform: translateY(0);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .accordion-wrapper.collapsed .goal-body { opacity: 0; transform: translateY(-20px); }
+
+        /* Resto de estilos */
+        .progress-container { background: rgba(255,255,255,0.1); height: 15px; border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        .progress-bar { background: var(--car-color); height: 100%; border-radius: 10px; width: 0%; transition: width 1s ease-in-out; box-shadow: 0 0 10px var(--car-color); }
+        
+        .edit-goal-form { display: none; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
+        .input-dark { background: rgba(255,255,255,0.1); border: 1px solid #444; color: white; padding: 8px; border-radius: 5px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-mini { padding: 5px 10px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; }
+        .btn-save { background: var(--car-color); color: white; }
+        .btn-edit { background: transparent; border: 1px solid #64748b; color: #64748b; font-size: 0.8rem; margin-left: 10px; }
+
+        /* General Cards */
+        .card { background: var(--bg-card); padding: 30px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; text-align: center; }
+        .grid-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 16px; text-align: center; }
+        .stat-value { font-size: 1.2rem; font-weight: 700; color: white; margin-top: 5px; }
+        .btn-retirar { display: inline-block; border: 1px solid var(--gold); color: var(--gold); padding: 10px 20px; border-radius: 12px; text-decoration: none; margin-top: 20px; }
+        .chart-section { height: 300px; display: flex; justify-content: center; }
+        
+        /* BOTONES DE AJUSTE */
+        .btn-ajustar { background: transparent; border: 1px solid #22d3ee; color: #22d3ee; padding: 5px 10px; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        .form-ajuste { display: none; margin-top: 10px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; }
+        .msg-alert { padding: 10px; margin-bottom: 20px; border-radius: 10px; background: rgba(52, 211, 153, 0.2); color: #34d399; text-align: center;}
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <a href="{% url 'menu' %}" class="logo-link">
+            <h1><i class="fa-solid fa-wallet"></i> Vitality Finanzas</h1>
+        </a>
+    </header>
+
+    <div class="content-container">
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="msg-alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="goal-card">
+            <div class="goal-header-top" onclick="toggleGoal()">
+                <div class="goal-info">
+                    <h3>META ACTUAL <button type="button" onclick="event.stopPropagation(); toggleEditGoal()" class="btn-mini btn-edit"><i class="fa-solid fa-pen"></i> Editar</button></h3>
+                    <h2>{{ mi_meta.nombre }} 🏁</h2>
+                </div>
+                <button class="toggle-btn" id="goalArrow"><i class="fa-solid fa-chevron-down"></i></button>
+            </div>
+
+            <div class="accordion-wrapper" id="goalAccordion">
+                <div class="accordion-content">
+                    <div class="goal-body">
+                        <div style="display: flex; justify-content: space-between; color: #94a3b8; margin-bottom: 5px;">
+                            <span>Progreso: {{ porcentaje_auto }}%</span>
+                            <span>${{ total_ahorrado|intcomma }} / ${{ mi_meta.monto_objetivo|intcomma }}</span>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: {{ porcentaje_auto }}%;"></div>
+                        </div>
+
+                        <form action="{% url 'editar_meta' %}" method="POST" class="edit-goal-form" id="editGoalForm">
+                            {% csrf_token %}
+                            <label style="display:block; color:#ccc; margin-bottom:5px;">Nombre de la meta:</label>
+                            <input type="text" name="nombre_meta" value="{{ mi_meta.nombre }}" class="input-dark">
+                            
+                            <label style="display:block; color:#ccc; margin-bottom:5px;">Monto Objetivo ($):</label>
+                            <input type="number" name="monto_meta" value="{{ mi_meta.monto_objetivo }}" class="input-dark">
+                            
+                            <button type="submit" class="btn-mini btn-save">Guardar Cambios</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="color: var(--gold);">Patrimonio Acumulado</h3>
+            <h2 style="font-size: 3rem;">${{ saldo_boveda|intcomma }}</h2>
+            <p style="color: #94a3b8;">Dinero total guardado</p>
+            <a href="{% url 'retirar' %}" class="btn-retirar"><i class="fa-solid fa-money-bill-transfer"></i> Retirar</a>
+        </div>
+
+        <div class="grid-stats">
+            <div class="stat-box">
+                <div style="color: #34d399;">Ahorro</div>
+                <div class="stat-value">+${{ total_ahorrado|intcomma }}</div>
+                
+                <button onclick="toggleAjusteAhorro()" class="btn-ajustar" style="border-color: #34d399; color: #34d399;"><i class="fa-solid fa-pen"></i> Ajustar</button>
+                
+                <form action="{% url 'actualizar_ahorro' %}" method="POST" class="form-ajuste" id="formAjusteAhorro">
+                    {% csrf_token %}
+                    <input type="number" name="monto_real" placeholder="$ Real" required class="input-dark">
+                    <button type="submit" class="btn-mini btn-save" style="background-color: #34d399;">OK</button>
+                </form>
+            </div>
+            
+            <div class="stat-box">
+                <div style="color: #22d3ee;">Invertido</div>
+                <div class="stat-value">+${{ total_invertido|intcomma }}</div>
+                <button onclick="toggleAjuste()" class="btn-ajustar"><i class="fa-solid fa-pen"></i> Ajustar</button>
+                <form action="{% url 'actualizar_inversion' %}" method="POST" class="form-ajuste" id="formAjuste">
+                    {% csrf_token %}
+                    <input type="number" name="monto_real" placeholder="$ Real" required class="input-dark">
+                    <button type="submit" class="btn-mini btn-save">OK</button>
+                </form>
+            </div>
+            
+            <div class="stat-box">
+                <div style="color: #f87171;">Retiros Reales</div>
+                <div class="stat-value">-${{ total_retirado|intcomma }}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Composición</h3>
+            <div class="chart-section"><canvas id="vaultChart"></canvas></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleGoal() {
+            var accordion = document.getElementById('goalAccordion');
+            var arrow = document.getElementById('goalArrow');
+            accordion.classList.toggle('collapsed');
+            
+            if (accordion.classList.contains('collapsed')) {
+                arrow.style.transform = "rotate(-90deg)"; 
+            } else {
+                arrow.style.transform = "rotate(0deg)"; 
+            }
+        }
+
+        function toggleEditGoal() {
+            const form = document.getElementById('editGoalForm');
+            form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function toggleAjuste() {
+            const form = document.getElementById('formAjuste');
+            form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function toggleAjusteAhorro() {
+            const form = document.getElementById('formAjusteAhorro');
+            form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+        }
+
+        const ctx = document.getElementById('vaultChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: JSON.parse('{{ labels_boveda|safe }}'),
+                datasets: [{
+                    label: 'Monto (CLP)',
+                    data: JSON.parse('{{ data_boveda|safe }}'),
+                    backgroundColor: ['#34d399', '#22d3ee', '#f87171'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

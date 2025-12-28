@@ -1,0 +1,14 @@
+# Archivos de Python compilados
+__pycache__/
+*.py[cod]
+
+# Base de datos (si usaras SQLite)
+db.sqlite3
+
+# Entornos virtuales (¡Para que no suba miles de archivos!)
+env/
+venv/
+.env
+
+# Archivos de sistema
+.DS_Store

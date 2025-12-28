@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Principal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-body: #0f172a; --bg-card: #1e293b;
+            --primary: #38bdf8; --secondary: #818cf8;
+            --gold: #fbbf24; --green: #34d399;
+            --purple: #c084fc; /* NUEVO COLOR MORADO */
+            --text-main: #f1f5f9; --text-muted: #94a3b8;
+        }
+        html { background-color: var(--bg-body); }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header simplificado */
+        .simple-header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-welcome { font-size: 1.1rem; color: var(--text-muted); }
+        .user-welcome span { color: var(--primary); font-weight: 700; }
+        
+        /* Contenedor Central */
+        .menu-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px; /* Espacio entre tarjetas */
+            padding: 20px;
+            flex-wrap: wrap; /* Esto permite que si no caben 4, bajen a la siguiente linea */
+        }
+
+        /* TARJETAS DE OPCIÓN */
+        .menu-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.05);
+            width: 260px; /* Reduje un poco el ancho para que quepan mejor las 4 */
+            height: 350px;
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Efecto Hover Genérico */
+        .menu-card:hover { transform: translateY(-10px); }
+
+        /* Iconos grandes */
+        .icon-circle {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            transition: 0.3s;
+        }
+
+        /* --- ALINEACIÓN --- */
+        .text-content {
+            text-align: center;
+            width: 100%;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        /* --- ESTILOS ESPECÍFICOS POR TARJETA --- */
+        
+        /* 1. Billetera Diaria (Azul) */
+        .card-finanzas .icon-circle { background: rgba(56, 189, 248, 0.1); color: var(--primary); }
+        .card-finanzas:hover { border-color: var(--primary); box-shadow: 0 20px 40px rgba(56, 189, 248, 0.15); }
+        .card-finanzas:hover .icon-circle { background: var(--primary); color: #0f172a; }
+
+        /* 2. Ahorro (Dorado) */
+        .card-ahorro .icon-circle { background: rgba(251, 191, 36, 0.1); color: var(--gold); }
+        .card-ahorro:hover { border-color: var(--gold); box-shadow: 0 20px 40px rgba(251, 191, 36, 0.15); }
+        .card-ahorro:hover .icon-circle { background: var(--gold); color: #0f172a; }
+
+        /* 3. NUEVO: Mis Saldos (Morado) */
+        .card-saldos .icon-circle { background: rgba(192, 132, 252, 0.1); color: var(--purple); }
+        .card-saldos:hover { border-color: var(--purple); box-shadow: 0 20px 40px rgba(192, 132, 252, 0.15); }
+        .card-saldos:hover .icon-circle { background: var(--purple); color: #0f172a; }
+
+        /* 4. Nuevo Movimiento (Verde) */
+        .card-nuevo .icon-circle { background: rgba(52, 211, 153, 0.1); color: var(--green); }
+        .card-nuevo:hover { border-color: var(--green); box-shadow: 0 20px 40px rgba(52, 211, 153, 0.15); }
+        .card-nuevo:hover .icon-circle { background: var(--green); color: #0f172a; }
+
+        /* Textos */
+        h2 { margin: 0; font-size: 1.3rem; color: white; font-weight: 600; }
+        p { color: var(--text-muted); font-size: 0.85rem; margin-top: 10px; line-height: 1.4; }
+
+        .btn-logout {
+            color: #f87171; text-decoration: none; font-weight: 600; border: 1px solid #f87171; padding: 8px 16px; border-radius: 12px; transition: 0.3s;
+        }
+        .btn-logout:hover { background: #f87171; color: white; }
+
+        /* Móvil */
+        @media (max-width: 900px) {
+            .menu-container { flex-direction: column; padding: 20px 0; height: auto; }
+            .menu-card { width: 90%; height: 120px; flex-direction: row; justify-content: flex-start; padding: 0 20px; gap: 20px; }
+            .icon-circle { width: 50px; height: 50px; font-size: 1.5rem; margin-bottom: 0; min-width: 50px; }
+            .text-content { text-align: left; }
+            h2 { font-size: 1.1rem; }
+            p { margin: 5px 0 0 0; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="simple-header">
+        <div class="user-welcome">Hola, <span>{{ user.username }}</span></div>
+        <form action="{% url 'logout' %}" method="post">{% csrf_token %}
+            <button type="submit" class="btn-logout" style="background:transparent; cursor:pointer;">Cerrar Sesión</button>
+        </form>
+    </div>
+
+    <div class="menu-container">
+        
+        <a href="{% url 'home' %}" class="menu-card card-finanzas">
+            <div class="icon-circle">
+                <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div class="text-content">
+                <h2>Billetera Diaria</h2>
+                <p>Control de gastos e ingresos del día a día.</p>
+            </div>
+        </a>
+
+        <a href="{% url 'ahorro' %}" class="menu-card card-ahorro">
+            <div class="icon-circle">
+                <i class="fa-solid fa-vault"></i>
+            </div>
+            <div class="text-content">
+                <h2>Ahorro e Inversión</h2>
+                <p>Tu bóveda de crecimiento y patrimonio.</p>
+            </div>
+        </a>
+
+        <a href="{% url 'saldos' %}" class="menu-card card-saldos">
+            <div class="icon-circle">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="text-content">
+                <h2>Mis Saldos</h2>
+                <p>Capital repartido en bancos y efectivo.</p>
+            </div>
+        </a>
+
+        <a href="{% url 'agregar_transaccion' %}" class="menu-card card-nuevo">
+            <div class="icon-circle">
+                <i class="fa-solid fa-circle-plus"></i>
+            </div>
+            <div class="text-content">
+                <h2>Nuevo Movimiento</h2>
+                <p>Registra un ingreso o gasto rápidamente.</p>
+            </div>
+        </a>
+
+    </div>
+
+</body>
+</html>

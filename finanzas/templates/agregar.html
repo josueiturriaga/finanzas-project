@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Movimiento</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CORE CONFIG (Mismos colores) --- */
+        :root {
+            --bg-body: #0f172a; --bg-card: #1e293b;
+            --primary: #38bdf8; --secondary: #818cf8;
+            --danger: #f87171; --text-main: #f1f5f9; --text-muted: #94a3b8;
+        }
+
+        html { background-color: var(--bg-body); }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        .main-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 40px;
+        }
+        .logo-link { text-decoration: none; }
+        .logo-area h1 { margin: 0; font-weight: 700; font-size: 1.5rem; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-info { display: flex; align-items: center; gap: 20px; }
+        .btn-logout { background: rgba(248, 113, 113, 0.1); color: var(--danger); border: none; padding: 8px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; font-family: 'Poppins', sans-serif;}
+        .btn-logout:hover { background: var(--danger); color: white; }
+
+        /* --- FORM --- */
+        .page-content { display: flex; justify-content: center; padding-bottom: 50px; }
+        .form-container { background: var(--bg-card); padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); width: 100%; max-width: 500px; border: 1px solid rgba(255,255,255,0.05); }
+        h2 { text-align: center; color: white; margin-top: 0; margin-bottom: 30px; font-weight: 600; }
+        
+        label { display: block; font-weight: 500; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
+        input, select, textarea { width: 100%; padding: 14px; background-color: var(--bg-body); border: 1px solid #334155; border-radius: 12px; color: white; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 0.95rem; transition: 0.3s; margin-bottom: 20px; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
+        
+        button { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #0f172a; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform 0.2s; font-family: 'Poppins', sans-serif; }
+        button:hover { transform: translateY(-2px); }
+        .btn-cancelar { display: block; text-align: center; text-decoration: none; margin-top: 15px; padding: 12px; color: var(--danger); border: 1px solid var(--danger); border-radius: 12px; font-weight: 600; transition: 0.3s; }
+        .btn-cancelar:hover { background-color: var(--danger); color: white; }
+        .helptext { display: none; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo-area">
+            <a href="{% url 'menu' %}" class="logo-link">
+                <h1><i class="fa-solid fa-wallet"></i> Vitality Finanzas</h1>
+            </a>
+        </div>
+        <div class="user-info">
+            <span style="color:#94a3b8"><i class="fa-regular fa-user"></i> {{ user.username }}</span>
+            <form action="{% url 'logout' %}" method="post">{% csrf_token %}
+                <button type="submit" class="btn-logout" style="width: auto; margin:0; padding: 8px 16px;">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="form-container">
+            <h2><i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> Gestión de Movimiento</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <label>Concepto:</label>
+                {{ form.titulo }}
+
+                <label>Monto (CLP):</label>
+                {{ form.monto }}
+
+                <label>Tipo:</label>
+                {{ form.tipo }} 
+                
+                <label>Categoría:</label>
+                {{ form.categoria }} 
+                
+                <label>Método de Pago:</label>
+                {{ form.metodo_pago }}
+
+                <label>Cuenta (Lugar del dinero):</label>
+                {{ form.cuenta }}
+
+                <label>Tipo de Gasto (Opcional en Ingresos):</label>
+                {{ form.tipo_gasto }}
+
+                <label>Fecha:</label>
+                {{ form.fecha }}
+                
+                <button type="submit">Guardar Transacción</button>
+                <a href="{% url 'menu' %}" class="btn-cancelar">Cancelar</a>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectTipo = document.getElementById('id_tipo');
+            const selectCategoria = document.getElementById('id_categoria');
+
+            // Definimos qué categorías pertenecen a cada grupo
+            // IMPORTANTE: Los nombres aquí deben coincidir con los de models.py
+            const categoriasIngreso = ['sueldo', 'negocio', 'mesada_tatas', 'mesada_luis', 'otro_ingreso'];
+            const categoriasGasto = ['bencina', 'diezmo', 'pasajes', 'regalos', 'comida', 'inversion', 'ahorro', 'arriendo', 'servicios', 'salud', 'ocio', 'varios'];
+
+            function filtrarCategorias() {
+                const tipoSeleccionado = selectTipo.value; // 'ingreso' o 'gasto'
+                const opciones = selectCategoria.options;
+
+                // Recorremos todas las opciones del select de Categoría
+                for (let i = 0; i < opciones.length; i++) {
+                    const valorOpcion = opciones[i].value;
+
+                    if (tipoSeleccionado === 'ingreso') {
+                        // Si es ingreso, mostramos solo las de ingreso
+                        if (categoriasIngreso.includes(valorOpcion)) {
+                            opciones[i].style.display = 'block'; // Mostrar
+                        } else {
+                            opciones[i].style.display = 'none';  // Ocultar
+                        }
+                    } else if (tipoSeleccionado === 'gasto') {
+                        // Si es gasto, mostramos solo las de gasto
+                        if (categoriasGasto.includes(valorOpcion)) {
+                            opciones[i].style.display = 'block';
+                        } else {
+                            opciones[i].style.display = 'none';
+                        }
+                    }
+                }
+                
+                // Reiniciar la selección al primer elemento visible para evitar errores
+                if (tipoSeleccionado === 'ingreso') selectCategoria.value = 'sueldo';
+                if (tipoSeleccionado === 'gasto') selectCategoria.value = 'comida';
+            }
+
+            // Ejecutar al cambiar el Tipo
+            selectTipo.addEventListener('change', filtrarCategorias);
+
+            // Ejecutar al cargar la página (por si vienes de editar)
+            filtrarCategorias();
+        });
+    </script>
+
+</body>
+</html>
