@@ -1,10 +1,15 @@
 from pathlib import Path
-import os  # <--- IMPORTANTE: Necesario para la configuración de la nube
+import os
+from dotenv import load_dotenv  # <--- IMPORTANTE: Importamos la librería
+
+# Cargar las variables del archivo .env
+load_dotenv()  # <--- IMPORTANTE: Esto lee tu archivo secreto
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-12&w3f+zqii4orv*8@ks^a7m5g7ma7w6&)km3)flq$hcde+l)^'
+# AHORA LA CLAVE VIENE DEL ARCHIVO OCULTO, YA NO ESTÁ VISIBLE
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
@@ -62,7 +67,8 @@ if 'PYTHONANYWHERE_DOMAIN' in os.environ:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'josuefinanzas$finanzas_db',
             'USER': 'josuefinanzas',
-            'PASSWORD': 'josue1234',  # <--- AQUI PONES LA QUE CREASTE EN EL PASO 1
+            # AQUI USAMOS LA CLAVE OCULTA DEL .ENV
+            'PASSWORD': os.getenv('DB_PASSWORD_NUBE'),
             'HOST': 'josuefinanzas.mysql.pythonanywhere-services.com',
         }
     }
@@ -73,7 +79,7 @@ else:
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'finanzas_db',
             'USER': 'root',
-            'PASSWORD': '',  # En tu PC suele ser vacía
+            'PASSWORD': '',  # En local suele ser vacía, así que esto está bien
             'HOST': 'localhost',
             'PORT': '3306',
         }
@@ -102,9 +108,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'es-es'       # <--- Ajustado a Español
+LANGUAGE_CODE = 'es-es'
 
-TIME_ZONE = 'America/Santiago' # <--- Ajustado a Chile para que las fechas sean correctas
+TIME_ZONE = 'America/Santiago'
 
 USE_I18N = True
 
@@ -117,7 +123,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-# Esta línea es VITAL para que funcionen los estilos en la nube
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
 
 # Default primary key field type
@@ -127,9 +132,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # --- CONFIGURACIÓN DE LOGIN ---
-LOGIN_REDIRECT_URL = 'menu'   # Cuando entras, te lleva al menú
-LOGOUT_REDIRECT_URL = 'login' # Cuando sales, te lleva al login
-LOGIN_URL = 'login'           # Si no estás logueado, te manda aquí
+LOGIN_REDIRECT_URL = 'menu'
+LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'login'
 
-# --- NUEVO: CORREO POR CONSOLA ---
+# --- CONFIGURACIÓN DE CORREO (Consola) ---
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

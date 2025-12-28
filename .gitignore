@@ -12,3 +12,6 @@ venv/
 
 # Archivos de sistema
 .DS_Store
+
+# Secretos
+.env
